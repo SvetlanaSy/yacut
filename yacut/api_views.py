@@ -1,29 +1,39 @@
+import re
 from flask import jsonify, request
 
 from . import app, db
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 from .views import get_unique_short_id
+from settings import SYMBOLS
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
 def get_original(short_id):
+    if not short_id:
+        raise InvalidAPIUsage('Укажите short_id', 400)
     urlmap = URLMap.query.filter_by(short=short_id).first()
     if urlmap is None:
-        raise InvalidAPIUsage('Ссылка с указанным short_id не найдена', 404)
+        raise InvalidAPIUsage('Указанный id не найден', 404)
     return jsonify({'url': urlmap.original}), 200
 
 
 @app.route('/api/id/', methods=['POST'])
 def create_short_link():
     data = request.get_json()
-    if 'url' not in data:
-        raise InvalidAPIUsage('В запросе отсутствуют обязательные поля')
-    if 'custom_id' in data and URLMap.query.filter_by(short=data['custom_id']).first() is not None:
-        raise InvalidAPIUsage('Такая ссылка уже есть в базе данных')
-    if data.get('custom_id') is None:
-        data['custom_id'] = get_unique_short_id()
     urlmap = URLMap()
+    if not data:
+        raise InvalidAPIUsage('Отсутствует тело запроса')
+    if 'url' not in data:
+        raise InvalidAPIUsage('"url" является обязательным полем!')
+    if 'custom_id' in data and URLMap.query.filter_by(short=data['custom_id']).first() is not None:
+        raise InvalidAPIUsage('Предложенный вариант короткой ссылки уже существует.')
+    if 'custom_id' in data and len(str(data.get('custom_id'))) > 16:
+        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
+    if 'custom_id' in data and not all((symbol in SYMBOLS) for symbol in str(data['custom_id'])):
+        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
+    if 'custom_id' not in data or data['custom_id'] == '' or data['custom_id'] is None:
+        data['custom_id'] = get_unique_short_id()
     urlmap.from_dict(data)
     db.session.add(urlmap)
     db.session.commit()
