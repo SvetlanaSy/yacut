@@ -1,5 +1,5 @@
 {% extends "base.html" %} 
-{% block title %} YaCut - укоротитель ссылок {%endblock %} 
+{% block title %} YaCut - укоротитель ссылок {% endblock %} 
 {% block content %}
 <main>
     <section class="container my-5 px-4">
@@ -20,22 +20,18 @@
 {#                  <input type="text" class="form-control form-control-lg py-2 mb-3" id="form-title" name="" placeholder="Длинная ссылка" > #}
                     {{ form.original_link(class="form-control form-control-lg py-3 mb-3", placeholder=form.original_link.label.text) }}
                   <p>
-                    {% if form.original_link.errors %}
                     {% for error in form.original_link.errors %}
                     <span style="color:red">{{ error }}</span>
                     {% endfor %}
-                    {% endif %}
                   </p>
                 </div>
                 <div>
 {#                  <input type="url" class="form-control form-control-lg py-2 mb-3" id="form-link" name="" placeholder="Ваш вариант короткой ссылки"> #}
                   {{ form.custom_id(class="form-control form-control-lg py-3 mb-3", placeholder=form.custom_id.label.text) }}
                   <p>
-                    {% if form.custom_id.errors %}
                     {% for error in form.custom_id.errors %}  
                     <span style="color:red">{{ error }}</span>
                     {% endfor %}
-                    {% endif %}
                   </p>
                 </div>
 

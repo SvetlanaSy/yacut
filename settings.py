@@ -3,8 +3,9 @@ import string
 
 FIELDS = {'original': 'url', 'short': 'custom_id'}
 REGULAR_SYMBOLS = r'^[a-zA-Z\d]{1,16}$'
-SYMBOLS = string.ascii_letters + string.digits
+FORMAT_SYMBOLS = string.ascii_letters + string.digits
 SYMBOLS_NUMBER = 6
+ORIGINAL_MIN_STRING = 1
 ORIGINAL_MAX_STRING = 1256
 SHORT_MAX_STRING = 16
 

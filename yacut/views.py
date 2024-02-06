@@ -5,11 +5,11 @@ from flask import abort, flash, redirect, render_template
 from . import app, db
 from .forms import URLMapForm
 from .models import URLMap
-from settings import SYMBOLS, SYMBOLS_NUMBER
+from settings import FORMAT_SYMBOLS, SYMBOLS_NUMBER
 
 
 def get_unique_short_id():
-    return ''.join(random.choices(SYMBOLS, k=SYMBOLS_NUMBER))
+    return ''.join(random.choices(FORMAT_SYMBOLS, k=SYMBOLS_NUMBER))
 
 
 @app.route('/', methods=['GET', 'POST'])

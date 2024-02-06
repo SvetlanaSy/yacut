@@ -4,7 +4,11 @@ from . import app, db
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 from .views import get_unique_short_id
-from settings import SYMBOLS
+from settings import FORMAT_SYMBOLS
+
+
+def short_url_exist(short_url):
+    return URLMap.query.filter_by(short=short_url).first()
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
@@ -21,16 +25,18 @@ def get_original(short_id):
 def create_short_link():
     data = request.get_json()
     urlmap = URLMap()
+
     if not data:
         raise InvalidAPIUsage('Отсутствует тело запроса')
     if 'url' not in data:
         raise InvalidAPIUsage('"url" является обязательным полем!')
-    if 'custom_id' in data and URLMap.query.filter_by(short=data['custom_id']).first() is not None:
-        raise InvalidAPIUsage('Предложенный вариант короткой ссылки уже существует.')
-    if 'custom_id' in data and len(str(data.get('custom_id'))) > 16:
-        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
-    if 'custom_id' in data and not all((symbol in SYMBOLS) for symbol in str(data['custom_id'])):
-        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
+    if 'custom_id' in data:
+        if short_url_exist(data['custom_id']):
+            raise InvalidAPIUsage('Предложенный вариант короткой ссылки уже существует.')
+        if len(str(data.get('custom_id'))) > 16:
+            raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
+        if not all((symbol in FORMAT_SYMBOLS) for symbol in str(data['custom_id'])):
+            raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
     if 'custom_id' not in data or data['custom_id'] == '' or data['custom_id'] is None:
         data['custom_id'] = get_unique_short_id()
     urlmap.from_dict(data)
