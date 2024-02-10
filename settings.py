@@ -1,13 +1,12 @@
 import os
 import string
 
-FIELDS = {'original': 'url', 'short': 'custom_id'}
-REGULAR_SYMBOLS = r'^[a-zA-Z\d]{1,16}$'
-FORMAT_SYMBOLS = string.ascii_letters + string.digits
-SYMBOLS_NUMBER = 6
-ORIGINAL_MIN_STRING = 1
-ORIGINAL_MAX_STRING = 1256
-SHORT_MAX_STRING = 16
+MODEL_VC_API_FIELDS = {'original': 'url', 'short': 'custom_id'}
+URL_SYMBOLS = string.ascii_letters + string.digits
+URL_LENGTH = 6
+ORIGINAL_MIN_LENGTH = 1
+ORIGINAL_MAX_LENGTH = 1256
+SHORT_MAX_LENGTH = 16
 
 
 class Config(object):

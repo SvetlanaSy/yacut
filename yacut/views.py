@@ -1,15 +1,9 @@
-import random
-
 from flask import abort, flash, redirect, render_template
 
 from . import app, db
 from .forms import URLMapForm
 from .models import URLMap
-from settings import FORMAT_SYMBOLS, SYMBOLS_NUMBER
-
-
-def get_unique_short_id():
-    return ''.join(random.choices(FORMAT_SYMBOLS, k=SYMBOLS_NUMBER))
+from .utils import get_unique_short_id, get_short_url
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -20,7 +14,7 @@ def index_view():
     custom_id = form.custom_id.data
     if custom_id is None or custom_id == '':
         custom_id = get_unique_short_id()
-    if URLMap.query.filter_by(short=custom_id).first():
+    if get_short_url(custom_id):
         flash('Предложенный вариант короткой ссылки уже существует.')
         return render_template('urlmap.html', form=form)
     urlmap = URLMap(
@@ -34,7 +28,6 @@ def index_view():
 
 @app.route('/<string:short_link>')
 def redirect_view(short_link):
-    urlmap = URLMap.query.filter_by(short=short_link).first()
-    if not urlmap:
+    if not get_short_url(short_link):
         abort(404)
-    return redirect(urlmap.original)
+    return redirect(get_short_url(short_link).original)
