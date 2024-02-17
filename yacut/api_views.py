@@ -3,8 +3,7 @@ from flask import jsonify, request
 from . import app, db
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
-from .utils import get_unique_short_id, get_short_url
-from settings import URL_SYMBOLS, SHORT_MAX_LENGTH
+from .utils import generate_unique_short_id, get_short_url
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
@@ -26,14 +25,9 @@ def create_short_link():
         raise InvalidAPIUsage('Отсутствует тело запроса')
     if 'url' not in data:
         raise InvalidAPIUsage('"url" является обязательным полем!')
-    if 'custom_id' not in data or data['custom_id'] == '' or data['custom_id'] is None:
-        data['custom_id'] = get_unique_short_id()
+    data['custom_id'] = generate_unique_short_id(data)
     if get_short_url(data['custom_id']):
         raise InvalidAPIUsage('Предложенный вариант короткой ссылки уже существует.')
-    if len(data.get('custom_id')) > SHORT_MAX_LENGTH:
-        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
-    if not all((symbol in URL_SYMBOLS) for symbol in data['custom_id']):
-        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', 400)
     urlmap.from_dict(data)
     db.session.add(urlmap)
     db.session.commit()
