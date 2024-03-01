@@ -1,9 +1,9 @@
-from flask import abort, flash, redirect, render_template, request
+from flask import abort, flash, redirect, render_template
 
-from . import app, db
+from . import app
 from .forms import URLMapForm
 from .models import URLMap
-from .utils import generate_unique_short_id, get_short_url
+from .utils import generate_short_id, get_short_url
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -11,16 +11,16 @@ def index_view():
     form = URLMapForm()
     if not form.validate_on_submit():
         return render_template('urlmap.html', form=form)
-    custom_id = generate_unique_short_id(request.form)
-    if get_short_url(custom_id):
+    original = form.original_link.data
+    custom_id = form.custom_id.data
+    try:
+        custom_id = generate_short_id(original, custom_id)
+    except ValueError:
         flash('Предложенный вариант короткой ссылки уже существует.')
         return render_template('urlmap.html', form=form)
     urlmap = URLMap(
         original=form.original_link.data,
-        short=custom_id
-    )
-    db.session.add(urlmap)
-    db.session.commit()
+        short=custom_id)
     return render_template('urlmap.html', url=urlmap, form=form)
 
 
