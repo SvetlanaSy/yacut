@@ -3,7 +3,7 @@ from flask import jsonify, request
 from . import app
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
-from .utils import generate_short_id, get_short_url
+from .utils import create_short_id, get_short_url
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
@@ -28,7 +28,7 @@ def create_short_link():
     original = data['url']
     short = data.get('custom_id')
     try:
-        data['custom_id'] = generate_short_id(original, short)
+        data['custom_id'] = create_short_id(original, short)
     except ValueError as e:
         raise InvalidAPIUsage(f'{e}')
     urlmap.from_dict(data)

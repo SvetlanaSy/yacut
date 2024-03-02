@@ -3,7 +3,7 @@ from flask import abort, flash, redirect, render_template
 from . import app
 from .forms import URLMapForm
 from .models import URLMap
-from .utils import generate_short_id, get_short_url
+from .utils import create_short_id, get_short_url
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -14,7 +14,7 @@ def index_view():
     original = form.original_link.data
     custom_id = form.custom_id.data
     try:
-        custom_id = generate_short_id(original, custom_id)
+        custom_id = create_short_id(original, custom_id)
     except ValueError:
         flash('Предложенный вариант короткой ссылки уже существует.')
         return render_template('urlmap.html', form=form)
