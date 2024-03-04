@@ -29,8 +29,9 @@ def save_to_db(url, short_url):
 
 
 def create_short_id(url, short_url=None):
+    if short_url:
+        validate_short_id(short_url)
     if short_url is None or short_url == '':
         short_url = generate_short_id()
-    validate_short_id(short_url)
     save_to_db(url, short_url)
     return short_url
